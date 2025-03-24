@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bible-app-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bible-app
+  template:
+    metadata:
+      labels:
+        app: bible-app
+    spec:
+      containers:
+      - name: bible-app
+        image: victorebhojie/bible-llm-app # Update this line
+        ports:
+        - containerPort: 5000
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "0.5"
+          limits:
+            memory: "1Gi"
+            cpu: "1"
