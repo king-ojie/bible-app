@@ -78,6 +78,6 @@ stages:
                     action: deploy
                     kubernetesServiceConnection: $(aksConnection)
                     namespace: $(kubernetesNamespace)
-                    manifests: '$(System.DefaultWorkingDirectory)/k8s/deployment.yaml'
+                    manifests: '/home/vsts/work/1/drop/k8s/deployment.yaml'
                     containers: |
                       $(dockerRegistry)/$(imageName):$(Build.BuildId)
