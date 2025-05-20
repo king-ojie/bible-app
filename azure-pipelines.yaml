@@ -61,7 +61,6 @@ stages:
     dependsOn: Build
     jobs:
       - deployment: DeployToAKS
-        environment: 'aks-prod'
         pool:
           vmImage: 'ubuntu-latest'
         strategy:
@@ -78,6 +77,6 @@ stages:
                     action: deploy
                     kubernetesServiceConnection: $(aksConnection)
                     namespace: $(kubernetesNamespace)
-                    manifests: '$(Pipeline.Workspace)/drop/manifests/deployment.yaml'
+                    manifests: '$(System.DefaultWorkingDirectory)/_Bible App-CI/drop/k8s/deployment.yaml'
                     containers: |
                       $(dockerRegistry)/$(imageName):$(Build.BuildId)
