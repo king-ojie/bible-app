@@ -5,10 +5,21 @@
 </head>
 <body>
     <h1>Random Bible Verse</h1>
-    <p><strong>Verse:</strong> {{ verse }}</p>
-    <p><strong>Message:</strong> {{ message }}</p>
-    <form method="POST">
-        <button type="submit">Generate</button>
-    </form>
+    <p><strong>Verse:</strong> <span id="verse">{{ verse }}</span></p>
+    <p><strong>Message:</strong> <span id="message">{{ message }}</span></p>
+    <button id="generate-btn">Generate</button>
+
+    <script>
+        document.getElementById('generate-btn').addEventListener('click', async () => {
+            const response = await fetch('/generate'); // Your Flask API endpoint
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('verse').textContent = data.verse;
+                document.getElementById('message').textContent = data.message;
+            } else {
+                alert('Failed to fetch a new verse.');
+            }
+        });
+    </script>
 </body>
 </html>

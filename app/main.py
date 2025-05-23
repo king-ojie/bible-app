@@ -1,36 +1,45 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 import requests
 from transformers import pipeline
-import random
 
 app = Flask(__name__)
 
-# Load Hugging Face sentiment analysis model
+
 sentiment_analyzer = pipeline("sentiment-analysis")
 
-# Function to get a random Bible verse
 def get_random_bible_verse():
-    # Using a free Bible API (example: labs.bible.org)
-    api_url = "https://labs.bible.org/api/?passage=random&type=json"
+    api_url = "https://bible-api.com/data/kjv/random"
     response = requests.get(api_url)
     if response.status_code == 200:
-        verse_data = response.json()[0]
-        return f"{verse_data['bookname']} {verse_data['chapter']}:{verse_data['verse']} - {verse_data['text']}"
-    return "John 3:16 - For God so loved the world..."
+        data = response.json()
+        return data['random_verse']
+    return {
+        "book": "John",
+        "chapter": 3,
+        "verse": 16,
+        "text": "For God so loved the world..."
+    }
 
-# Function to generate a short message based on sentiment
-def generate_message(verse):
-    sentiment = sentiment_analyzer(verse)[0]
+def generate_sentiment(verse_text):
+    sentiment = sentiment_analyzer(verse_text)[0]
     if sentiment['label'] == 'POSITIVE':
         return "This verse brings hope and joy!"
     else:
         return "A thoughtful reminder to reflect."
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    verse = get_random_bible_verse()
-    message = generate_message(verse)
-    return render_template('index.html', verse=verse, message=message)
+    verse_dict = get_random_bible_verse()
+    verse_text = f"{verse_dict['book']} {verse_dict['chapter']}:{verse_dict['verse']} - {verse_dict['text']}"
+    sentiment_msg = generate_sentiment(verse_dict['text'])
+    return render_template('index.html', verse=verse_text, message=sentiment_msg)
+
+@app.route('/generate')
+def generate():
+    verse_dict = get_random_bible_verse()
+    verse_text = f"{verse_dict['book']} {verse_dict['chapter']}:{verse_dict['verse']} - {verse_dict['text']}"
+    sentiment_msg = generate_sentiment(verse_dict['text'])
+    return jsonify({"verse": verse_text, "message": sentiment_msg})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True)
